@@ -46,7 +46,7 @@ INSTALLED_APPS = [
     'django_json_widget',
 
     # custom apps
-    'Users.apps.UsersConfig',
+    'Customer.apps.CustomerConfig',
 ]
 
 MIDDLEWARE = [
@@ -131,7 +131,7 @@ CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
 
 # auth user
-AUTH_USER_MODEL = 'Users.User'
+AUTH_USER_MODEL = 'Customer.Customer'
 
 
 # Static files (CSS, JavaScript, Images)

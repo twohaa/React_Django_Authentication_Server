@@ -1,8 +1,8 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import AuthenticationFailed
-from .serializers import UserSerializer
-from .models import User
+from .serializers import CustomerSerializer
+from .models import Customer
 import jwt
 import datetime
 
@@ -10,7 +10,7 @@ import datetime
 # Create your views here.
 class RegisterView(APIView):
     def post(self, request):
-        serializer = UserSerializer(data=request.data)
+        serializer = CustomerSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
@@ -21,22 +21,21 @@ class LoginView(APIView):
         email = request.data['email']
         password = request.data['password']
 
-        user = User.objects.filter(email=email).first()
+        customer = Customer.objects.filter(email=email).first()
 
-        if user is None:
-            raise AuthenticationFailed('User not found!')
+        if customer is None:
+            raise AuthenticationFailed('Customer not found!')
 
-        if not user.check_password(password):
+        if not customer.check_password(password):
             raise AuthenticationFailed('Incorrect password!')
 
         payload = {
-            'id': user.id,
+            'id': customer.id,
             'exp': datetime.datetime.utcnow() + datetime.timedelta(minutes=60),
             'iat': datetime.datetime.utcnow()
         }
 
-        token = jwt.encode(payload, 'secret',
-                           algorithm='HS256')
+        token = jwt.encode(payload, 'secret', algorithm='HS256')
 
         response = Response()
 
@@ -47,7 +46,7 @@ class LoginView(APIView):
         return response
 
 
-class UserView(APIView):
+class CustomerView(APIView):
     def get(self, request):
         token = request.COOKIES.get('jwt')
 
@@ -59,8 +58,8 @@ class UserView(APIView):
         except jwt.ExpiredSignatureError:
             raise AuthenticationFailed('Unauthenticated!')
 
-        user = User.objects.filter(id=payload['id']).first()
-        serializer = UserSerializer(user)
+        customer = Customer.objects.filter(id=payload['id']).first()
+        serializer = CustomerSerializer(customer)
         return Response(serializer.data)
 
 
